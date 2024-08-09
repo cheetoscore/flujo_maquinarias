@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
@@ -288,3 +287,4 @@ with tab4:
             st.write(deudas[deudas['Descripcion'] == proyecto])
         else:
             st.error('Error al cargar uno o más conjuntos de datos.')
+
