@@ -69,7 +69,3 @@ def get_lista_equipos():
     except Exception as e:
         st.error(f"Error al obtener lista de equipos: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
-
-    check_columns(engine, 'lista_equipos')
-    query = "SELECT * FROM lista_equipos"
-    return pd.read_sql(query, engine)
