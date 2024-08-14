@@ -12,6 +12,10 @@ st.title('Flujo de Caja Mensual y Reporte Operativo')
 proyectos = get_proyectos()
 lista_equipos = get_lista_equipos()
 
+if proyectos.empty or lista_equipos.empty:
+    st.error("Error al cargar proyectos o lista de equipos. Verifique la conexión a la base de datos y los datos disponibles.")
+    st.stop()
+
 # Crear pestañas para cada tipo de reporte
 tab1, tab2, tab3, tab4 = st.tabs(["Flujo de Caja General", "Reporte Operativo", "Flujo de Caja por Equipo", "Flujo de Caja por Proyecto"])
 
@@ -36,6 +40,14 @@ with tab2:
         egresos = get_egresos(start_date, end_date)
         deudas = get_deudas(start_date, end_date)
         ingresos = get_ingresos(start_date, end_date)
+
+        # Verificar columnas
+        if "TOTAL" not in egresos.columns or "Fecha de vencimiento" not in deudas.columns or "Fecha" not in ingresos.columns:
+            st.error('Error: Las columnas esperadas no están presentes en uno o más conjuntos de datos.')
+            st.write("Columnas en egresos:", egresos.columns)
+            st.write("Columnas en deudas:", deudas.columns)
+            st.write("Columnas en ingresos:", ingresos.columns)
+            st.stop()
         
         if not egresos.empty and not deudas.empty and not ingresos.empty:
             st.success('Datos cargados satisfactoriamente.')
@@ -75,6 +87,14 @@ with tab3:
         egresos = get_egresos(start_date, end_date)
         deudas = get_deudas(start_date, end_date)
         ingresos = get_ingresos(start_date, end_date)
+
+        # Verificar columnas
+        if "COD_EQUIPO" not in egresos.columns or "EQUIPO" not in deudas.columns or "Id_equipo" not in ingresos.columns:
+            st.error('Error: Las columnas esperadas no están presentes en uno o más conjuntos de datos.')
+            st.write("Columnas en egresos:", egresos.columns)
+            st.write("Columnas en deudas:", deudas.columns)
+            st.write("Columnas en ingresos:", ingresos.columns)
+            st.stop()
         
         if not egresos.empty and not deudas.empty and not ingresos.empty:
             st.success('Datos cargados satisfactoriamente.')
@@ -114,6 +134,14 @@ with tab4:
         egresos = get_egresos(start_date, end_date)
         deudas = get_deudas(start_date, end_date)
         ingresos = get_ingresos(start_date, end_date)
+
+        # Verificar columnas
+        if "NOMBREPROYECTO" not in egresos.columns or "Descripcion" not in deudas.columns or "Proyecto" not in ingresos.columns:
+            st.error('Error: Las columnas esperadas no están presentes en uno o más conjuntos de datos.')
+            st.write("Columnas en egresos:", egresos.columns)
+            st.write("Columnas en deudas:", deudas.columns)
+            st.write("Columnas en ingresos:", ingresos.columns)
+            st.stop()
         
         if not egresos.empty and not deudas.empty and not ingresos.empty:
             st.success('Datos cargados satisfactoriamente.')
@@ -133,5 +161,6 @@ with tab4:
             st.write(deudas[deudas['Descripcion'] == proyecto])
         else:
             st.error('Error al cargar uno o más conjuntos de datos.')
+
 
 
