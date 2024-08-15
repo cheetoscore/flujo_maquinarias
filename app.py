@@ -5,6 +5,7 @@ from data_loader import get_egresos, get_deudas, get_ingresos, get_proyectos, ge
 from flujo_equipo import flujo_caja_por_equipo
 from flujo_proyecto import flujo_caja_por_proyecto
 from flujo_general import flujo_caja_general
+from resultados_economicos import mostrar_resultados_economicos
 
 st.title('Flujo de Caja Mensual y Reporte Operativo')
 
@@ -17,7 +18,7 @@ if proyectos.empty or lista_equipos.empty:
     st.stop()
 
 # Crear pestañas para cada tipo de reporte
-tab1, tab2, tab3, tab4 = st.tabs(["Flujo de Caja General", "Reporte Operativo", "Flujo de Caja por Equipo", "Flujo de Caja por Proyecto"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Flujo de Caja General", "Reporte Operativo", "Flujo de Caja por Equipo", "Flujo de Caja por Proyecto", "Resultados Económicos"])
 
 with tab1:
     flujo_caja_general()
@@ -161,6 +162,26 @@ with tab4:
             st.write(deudas[deudas['Descripcion'] == proyecto])
         else:
             st.error('Error al cargar uno o más conjuntos de datos.')
+
+with tab5:
+    st.header('Resultados Económicos')
+    inversion_inicial = 30000  # Esto es solo un ejemplo, deberías obtener el valor real
+    start_date = st.date_input('Fecha de inicio', value=pd.to_datetime('2023-01-01'))
+    end_date = st.date_input('Fecha de fin', value=pd.to_datetime('2023-12-31'))
+
+    if start_date > end_date:
+        st.error('La fecha de inicio no puede ser posterior a la fecha de fin.')
+        st.stop()
+
+    ingresos = get_ingresos(start_date, end_date)
+    egresos = get_egresos(start_date, end_date)
+
+    if ingresos.empty or egresos.empty:
+        st.error("Error al cargar ingresos o egresos. Verifique los datos disponibles.")
+        st.stop()
+
+    mostrar_resultados_economicos(ingresos, egresos, inversion_inicial)
+
 
 
 
