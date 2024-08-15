@@ -160,3 +160,7 @@ def flujo_caja_general():
             
             st.subheader(f'Detalles de Deudas para {mes_seleccionado}')
             st.write(detalles_deudas)
+
+            
+            st.subheader(f'Detalles de Deudas para {mes_seleccionado}')
+            st.write(detalles_deudas)
