@@ -1,4 +1,4 @@
-import os
+import subprocess
 
 if __name__ == '__main__':
-    os.system('streamlit run app.py')
+    subprocess.run(['streamlit', 'run', 'app.py'])
