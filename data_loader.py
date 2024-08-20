@@ -71,5 +71,3 @@ def get_lista_equipos():
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
 
 
-
-
