@@ -34,4 +34,3 @@ def check_columns():
 
 if __name__ == "__main__":
     check_columns()
-
