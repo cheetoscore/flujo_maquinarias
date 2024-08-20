@@ -1,19 +1,17 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objs as go
 from data_loader import get_egresos, get_deudas, get_ingresos, get_proyectos, get_lista_equipos
 from flujo_equipo import flujo_caja_por_equipo
 from flujo_proyecto import flujo_caja_por_proyecto
+from flujo_general import flujo_caja_general
 from resultados_economicos import mostrar_resultados_economicos
 
 st.title('Flujo de Caja Mensual y Reporte Operativo')
 
 # Obtener listas de proyectos y equipos
-try:
-    proyectos = get_proyectos()
-    lista_equipos = get_lista_equipos()
-except Exception as e:
-    st.error(f"Error al cargar datos: {e}")
-    st.stop()
+proyectos = get_proyectos()
+lista_equipos = get_lista_equipos()
 
 if proyectos.empty or lista_equipos.empty:
     st.error("Error al cargar proyectos o lista de equipos. Verifique la conexión a la base de datos y los datos disponibles.")
@@ -23,8 +21,7 @@ if proyectos.empty or lista_equipos.empty:
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Flujo de Caja General", "Reporte Operativo", "Flujo de Caja por Equipo", "Flujo de Caja por Proyecto", "Resultados Económicos"])
 
 with tab1:
-    st.header('Flujo de Caja General')
-    # Añadir aquí el contenido específico para el flujo de caja general
+    flujo_caja_general()
 
 with tab2:
     st.header('Reporte Operativo')
@@ -41,13 +38,9 @@ with tab2:
     cargar_datos = st.button('Cargar Datos', key='cargar_datos_operativo')
 
     if cargar_datos and start_date <= end_date:
-        try:
-            egresos = get_egresos(start_date, end_date)
-            deudas = get_deudas(start_date, end_date)
-            ingresos = get_ingresos(start_date, end_date)
-        except Exception as e:
-            st.error(f"Error al cargar datos: {e}")
-            st.stop()
+        egresos = get_egresos(start_date, end_date)
+        deudas = get_deudas(start_date, end_date)
+        ingresos = get_ingresos(start_date, end_date)
 
         # Verificar columnas
         if "TOTAL" not in egresos.columns or "Fecha de vencimiento" not in deudas.columns or "Fecha" not in ingresos.columns:
@@ -92,13 +85,9 @@ with tab3:
     cargar_datos = st.button('Cargar Datos', key='cargar_datos_equipo')
 
     if cargar_datos and start_date <= end_date:
-        try:
-            egresos = get_egresos(start_date, end_date)
-            deudas = get_deudas(start_date, end_date)
-            ingresos = get_ingresos(start_date, end_date)
-        except Exception as e:
-            st.error(f"Error al cargar datos: {e}")
-            st.stop()
+        egresos = get_egresos(start_date, end_date)
+        deudas = get_deudas(start_date, end_date)
+        ingresos = get_ingresos(start_date, end_date)
 
         # Verificar columnas
         if "COD_EQUIPO" not in egresos.columns or "EQUIPO" not in deudas.columns or "Id_equipo" not in ingresos.columns:
@@ -143,13 +132,9 @@ with tab4:
     cargar_datos = st.button('Cargar Datos', key='cargar_datos_proyecto')
 
     if cargar_datos and start_date <= end_date:
-        try:
-            egresos = get_egresos(start_date, end_date)
-            deudas = get_deudas(start_date, end_date)
-            ingresos = get_ingresos(start_date, end_date)
-        except Exception as e:
-            st.error(f"Error al cargar datos: {e}")
-            st.stop()
+        egresos = get_egresos(start_date, end_date)
+        deudas = get_deudas(start_date, end_date)
+        ingresos = get_ingresos(start_date, end_date)
 
         # Verificar columnas
         if "NOMBREPROYECTO" not in egresos.columns or "Descripcion" not in deudas.columns or "Proyecto" not in ingresos.columns:
@@ -180,29 +165,22 @@ with tab4:
 
 with tab5:
     st.header('Resultados Económicos')
+    inversion_inicial = 30000  # Esto es solo un ejemplo, deberías obtener el valor real
+    start_date = st.date_input('Fecha de inicio', value=pd.to_datetime('2023-01-01'))
+    end_date = st.date_input('Fecha de fin', value=pd.to_datetime('2023-12-31'))
 
-    start_date = st.date_input('Fecha de inicio', key='start_date_economicos', value=pd.to_datetime('2023-01-01'))
-    end_date = st.date_input('Fecha de fin', key='end_date_economicos')
-
-    # Validar que las fechas sean correctas
     if start_date > end_date:
         st.error('La fecha de inicio no puede ser posterior a la fecha de fin.')
-    
-    inversion_inicial = st.number_input('Inversión Inicial', min_value=0, value=100000, step=1000)
-    
-    # Confirmar la carga de datos
-    cargar_datos = st.button('Cargar Datos', key='cargar_datos_economicos')
+        st.stop()
 
-    if cargar_datos and start_date <= end_date:
-        try:
-            ingresos = get_ingresos(start_date, end_date)
-            egresos = get_egresos(start_date, end_date)
-        except Exception as e:
-            st.error(f"Error al cargar datos: {e}")
-            st.stop()
-        
-        mostrar_resultados_economicos(ingresos, egresos, inversion_inicial)
+    ingresos = get_ingresos(start_date, end_date)
+    egresos = get_egresos(start_date, end_date)
 
+    if ingresos.empty or egresos.empty:
+        st.error("Error al cargar ingresos o egresos. Verifique los datos disponibles.")
+        st.stop()
+
+    mostrar_resultados_economicos(ingresos, egresos, inversion_inicial)
 
 
 
