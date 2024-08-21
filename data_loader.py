@@ -1,10 +1,15 @@
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import streamlit as st
 from db_config import get_engine
 
 # Obtener el motor de la base de datos
 engine = get_engine()
+
+# Configurar sesión para manejar transacciones
+Session = sessionmaker(bind=engine)
+session = Session()
 
 # Funciones para obtener los datos necesarios con caché
 @st.cache_data(ttl=600)
@@ -15,10 +20,15 @@ def get_egresos(start_date, end_date):
     WHERE "FECHADOC" BETWEEN '{start_date}' AND '{end_date}'
     """
     try:
-        return pd.read_sql(query, engine)
+        result = pd.read_sql(query, engine)
+        session.commit()  # Confirmar la transacción
+        return result
     except Exception as e:
+        session.rollback()  # Hacer rollback en caso de error
         st.error(f"Error al obtener egresos: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
+    finally:
+        session.close()  # Asegurarse de cerrar la sesión
 
 @st.cache_data(ttl=600)
 def get_deudas(start_date, end_date):
@@ -28,10 +38,15 @@ def get_deudas(start_date, end_date):
     WHERE "Fecha de vencimiento" BETWEEN '{start_date}' AND '{end_date}'
     """
     try:
-        return pd.read_sql(query, engine)
+        result = pd.read_sql(query, engine)
+        session.commit()  # Confirmar la transacción
+        return result
     except Exception as e:
+        session.rollback()  # Hacer rollback en caso de error
         st.error(f"Error al obtener deudas: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
+    finally:
+        session.close()  # Asegurarse de cerrar la sesión
 
 @st.cache_data(ttl=600)
 def get_ingresos(start_date, end_date):
@@ -41,10 +56,15 @@ def get_ingresos(start_date, end_date):
     WHERE "Fecha" BETWEEN '{start_date}' AND '{end_date}'
     """
     try:
-        return pd.read_sql(query, engine)
+        result = pd.read_sql(query, engine)
+        session.commit()  # Confirmar la transacción
+        return result
     except Exception as e:
+        session.rollback()  # Hacer rollback en caso de error
         st.error(f"Error al obtener ingresos: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
+    finally:
+        session.close()  # Asegurarse de cerrar la sesión
 
 @st.cache_data(ttl=600)
 def get_proyectos():
@@ -53,10 +73,15 @@ def get_proyectos():
     FROM proyecto
     """
     try:
-        return pd.read_sql(query, engine)
+        result = pd.read_sql(query, engine)
+        session.commit()  # Confirmar la transacción
+        return result
     except Exception as e:
+        session.rollback()  # Hacer rollback en caso de error
         st.error(f"Error al obtener proyectos: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
+    finally:
+        session.close()  # Asegurarse de cerrar la sesión
 
 @st.cache_data(ttl=600)
 def get_lista_equipos():
@@ -65,9 +90,15 @@ def get_lista_equipos():
     FROM lista_equipos
     """
     try:
-        return pd.read_sql(query, engine)
+        result = pd.read_sql(query, engine)
+        session.commit()  # Confirmar la transacción
+        return result
     except Exception as e:
+        session.rollback()  # Hacer rollback en caso de error
         st.error(f"Error al obtener lista de equipos: {e}")
         return pd.DataFrame()  # Devuelve un DataFrame vacío en caso de error
+    finally:
+        session.close()  # Asegurarse de cerrar la sesión
+
 
 
